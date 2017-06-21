@@ -1,0 +1,135 @@
+<html>
+<body>
+
+  <p>Checkout below:</p>
+
+  <!-- Include our button within a form for seamless integration -->
+  <form id="checkout-form" action="checkout" method="post">
+    <!-- Note that you must pass a div element -->
+    <div id='bread-checkout-btn' data-bread-default-size=true></div>
+  </form>
+
+  <!-- Load the bread.js script (this can be here or usually in the head) -->
+  <script src='https://checkout-sandbox.getbread.com/bread.js' data-api-key='7101ea30-8ae3-47ab-a8bd-235860d36f3e'></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!-- Create the `opts` object -->
+  <script type='text/javascript'>
+    // Virtual Cart Object
+    var cart = {
+      products: [],
+      total: 0
+    };
+
+    // Hard Coded one object
+    cart.products[0] = {
+      name: "Apple Juice", // required
+      price: parseInt((1 * 100)), // required (value in cents USD)
+      sku: "aj001", // required
+      detailUrl: "https://www.amazon.com/Motts-Original-Apple-Juice-bottle/dp/B00CJ8I4UY/ref=sr_1_3_a_it?ie=UTF8&qid=1497983193&sr=8-3&keywords=apple+juice", // required
+      quantity: parseInt(1), // required
+    };
+    var items = [];
+
+    cart.products.forEach(function(p) {
+      items.push({
+        name: p.name, // required
+        price: parseInt((p.price * 100)), // required (value in cents USD)
+        sku: p.sku, // required
+        imageUrl: p.imgUrl, // optional
+        detailUrl: p.detailUrl, // required
+        quantity: parseInt(p.quantity) // required
+      });
+      cart.total+=parseInt((p.price));
+      console.log(cart.total);
+    });
+
+    // If you have their shipping address already, you can pass it to us
+    // so they do not have to fill it out again.
+    var shippingContact = {
+      fullName: 'Jane Doe',
+      address: '123 Test St.',
+      address2: '#8',
+      zip: '11238',
+      phone: '0103852945',
+      city: 'Coolstown',
+      state: 'NY',
+    };
+
+    // Likewise, if you have the billing contact, you can pass it in to us
+    // so they do not have to.
+    var billingContact = {
+      email: 'jane.doe@geocities.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
+      address: '123 Test St.',
+      address2: 'Apt. 4',
+      zip: '11238',
+      phone: '0103852945',
+      city: 'Coolstown',
+      state: 'NY',
+    };
+
+    // Below, we will build the required opts object.
+    var opts = {
+      buttonId: 'bread-checkout-btn',
+      items: items,
+      // Optional Array of Shipping Options
+      shippingOptions: [{
+          type: 'Overnight Shipping',
+          typeId: 'OS_001',
+          cost: 1500,
+        },
+        {
+          type: 'Two Day Shipping',
+          typeId: '2D_001',
+          cost: 1000,
+        }
+      ],
+      shippingContact: shippingContact,
+      billingContact: billingContact,
+      tax: 100,
+
+      calculateTax: function(shippingContact, callback) {
+        if (shippingContact.state == 'NY') {
+          opts.tax = cart.total * .05;
+        } else {
+          opts.tax = 0;
+        }
+
+        console.log("TAX", opts.tax);
+        callback(null, opts.tax*100);
+      },
+
+      done: function(err, tx_token) {
+        if (err !== null) {
+          alert("There was an error!" + err);
+          return;
+        }
+        // Via Ajax call you send the token to your server, and then redirect the user
+        $.ajax({
+          // If I want to send data to a server
+        }).done(function(data){
+          console.log("CHECKOUT COMPLETE");
+        });
+      },
+      asLowAs: true,
+      customCSS: ".bread-embed,body,html{margin:0;padding:0;position:absolute;top:0;right:0;bottom:0;left:0;font-family:sans-serif;}.bread-btn,.bread-label{border:2px solid #055170;border-radius:8px;background:#fff;font-size:13px;color:#fb2a2a;cursor:pointer}.bread-center{text-align:center;vertical-align:middle;height:100%;width:100%;display:table}.bread-center-inner{display:table-cell;vertical-align:middle}.bread-embed-inner{position:absolute;top:0;left:0;right:50px;bottom:0;padding:0 1em}.bread-embed-icon{position:absolute;top:-1px;right:-51px;bottom:-1px;left:100%;margin-left:-50px;margin-right:50px;background-color:#055170;background-repeat:no-repeat;background-image:url(assets/coin.png);background-position:center;background-size:auto 30px;border-radius:0 4px 4px 0;cursor:pointer}.bread-pot:before{content:'Pay Over Time'}.bread-btn .bread-as-low-as:before,.bread-label .bread-as-low-as:before{content:'As low as '}.bread-for:before{content:'For '}"
+
+      // customCSS: ".bread-embed,body,html{margin:0;padding:0;position:absolute;top:0;right:0;bottom:0;left:0;font-family:sans-serif}.bread-btn{border:2px solid #055170;border-radius:8px;background:#fff;font-size:13px;color:#fb2a2a;cursor:pointer}.bread-center{text-align:center;vertical-align:middle;height:100%;width:100%;display:table}.bread-center-inner{display:table-cell;vertical-align:middle}.bread-embed-inner{position:absolute;top:0;left:0;right:50px;bottom:0;padding:0 1em}.bread-embed-icon{position:absolute;top:-1px;right:-51px;bottom:-1px;left:100%;margin-left:-50px;margin-right:50px;background-color:#055170;background-repeat:no-repeat;background-image:url(assets/coin.png);background-position:center;background-size:auto 30px;border-radius:0 4px 4px 0;cursor:pointer}.bread-pot:before{content:'Pay Over Time'}.bread-btn .bread-as-low-as:before,.bread-label .bread-as-low-as:before{content:'As low as '}.bread-for:before{content:'For '}"
+    };
+
+    // We will assume your `cart` object has the `total`
+    // dollar amount of products in the cart.
+    // if (cart.total > 2000) {
+    //   // Use a non-default Targeted Financing Program for carts over $2000
+    //   opts.financingProgramId = '0000000-aaaa-bbbb-cccc-ddddddddddd';
+    // }
+
+
+    // Lastly, call `checkout` with `opts` as the argument.
+    bread.checkout(opts);
+  </script>
+</body>
+
+</html>

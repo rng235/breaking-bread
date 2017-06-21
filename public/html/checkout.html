@@ -1,0 +1,223 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Shopping Cart Dropdown</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <nav>
+    <div class="container">
+      <ul class="navbar-left">
+        <li><a href="#">Home</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+      <!--end navbar-left -->
+
+      <ul class="navbar-right">
+        <li><a href="#" id="cart"><i class="fa fa-shopping-cart"></i> Cart <span class="badge">1</span></a></li>
+      </ul>
+      <!--end navbar-right -->
+    </div>
+    <!--end container -->
+  </nav>
+
+  <div class="container">
+    <div class="shopping-cart">
+      <div class="shopping-cart-header">
+        <i class="fa fa-shopping-cart cart-icon"></i><span class="badge">1</span>
+        <div class="shopping-cart-total">
+          <span class="lighter-text">Total:</span>
+          <span class="main-color-text">$100.00</span>
+        </div>
+      </div>
+      <!--end shopping-cart-header -->
+
+      <ul class="shopping-cart-items">
+        <li class="clearfix">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/81ulw5P%2BQuL._SY679_.jpg" height="70" width="50" alt="item1" />
+          <span class="item-name">Apple Juice</span>
+          <span class="item-price">$100.00</span>
+          <span class="item-quantity">Quantity: 01</span>
+        </li>
+      </ul>
+
+      <a href="#" class="button">Checkout</a>
+      <!-- Include our button within a form for seamless integration -->
+      <form id="checkout-form" action="checkout" method="post">
+        <!-- Note that you must pass a div element -->
+        <div id='bread-checkout-btn' data-bread-default-size=true style='height:50px; margin-left:auto;margin-right:auto; width:200px'></div>
+      </form>
+    </div>
+    <!--end shopping-cart -->
+  </div>
+  <!--end container -->
+
+  <!-- Load the bread.js script (this can be here or usually in the head) -->
+  <script src='https://checkout-sandbox.getbread.com/bread.js' data-api-key='7101ea30-8ae3-47ab-a8bd-235860d36f3e'></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <script type='text/javascript'>
+    // Virtual Cart Object
+    var cart = {
+      products: [],
+      total: 0
+    };
+
+    // Hard Coded one object
+    cart.products[0] = {
+      name: "Apple Juice", // required
+      price: parseInt((1 * 100)), // required (value in cents USD)
+      sku: "aj001", // required
+      detailUrl: "https://www.amazon.com/Motts-Original-Apple-Juice-bottle/dp/B00CJ8I4UY/ref=sr_1_3_a_it?ie=UTF8&qid=1497983193&sr=8-3&keywords=apple+juice", // required
+      quantity: parseInt(1), // required
+    };
+    var items = [];
+
+    cart.products.forEach(function(p) {
+      items.push({
+        name: p.name, // required
+        price: parseInt((p.price * 100)), // required (value in cents USD)
+        sku: p.sku, // required
+        imageUrl: p.imgUrl, // optional
+        detailUrl: p.detailUrl, // required
+        quantity: parseInt(p.quantity) // required
+      });
+      cart.total += parseInt((p.price));
+      console.log(cart.total);
+    });
+
+    // If you have their shipping address already, you can pass it to us
+    // so they do not have to fill it out again.
+    var shippingContact = {
+      fullName: 'Jane Doe',
+      address: '123 Test St.',
+      address2: '#8',
+      zip: '11238',
+      phone: '0103852945',
+      city: 'Coolstown',
+      state: 'NY',
+    };
+
+    // Likewise, if you have the billing contact, you can pass it in to us
+    // so they do not have to.
+    var billingContact = {
+      email: 'jane.doe@geocities.com',
+      firstName: 'Jane',
+      lastName: 'Doe',
+      address: '123 Test St.',
+      address2: 'Apt. 4',
+      zip: '11238',
+      phone: '0103852945',
+      city: 'Coolstown',
+      state: 'NY',
+    };
+
+    var opts = {
+      buttonId: 'bread-checkout-btn',
+      items: items,
+
+      // Array of Shipping Options
+      shippingOptions: [{
+          type: 'Overnight Shipping',
+          typeId: 'OS_001',
+          cost: 1500,
+        },
+        {
+          type: 'Two Day Shipping',
+          typeId: '2D_001',
+          cost: 1000,
+        }
+      ],
+      shippingContact: shippingContact,
+      billingContact: billingContact,
+      tax: 100,
+
+      /*
+      * Function: calculateTax
+      * Description: Called as user inputs shippingContact. If user selects the state
+      * of NY, then tax is 5%, else tax is 0.
+      */
+      calculateTax: function(shippingContact, callback) {
+        if (shippingContact.state == 'NY') {
+          opts.tax = cart.total * .05;
+        } else {
+          opts.tax = 0;
+        }
+
+        console.log("TAX", opts.tax);
+        callback(null, opts.tax * 100);
+      },
+
+      /*
+      * Function: done
+      * Description: Called when user is done with the checkout process.
+      * Can be used to send transaction data to servers or redirect users.
+      */
+      done: function(err, tx_token) {
+        if (err !== null) {
+          alert("There was an error!" + err);
+          return;
+        }
+        console.log("TOKEN", tx_token)
+        // Via Ajax call you send the token to your server, and then redirect the user
+        $.ajax({
+          // If I want to send data to a server
+        }).done(function(data) {
+          console.log("CHECKOUT COMPLETE");
+        });
+      },
+
+      // Displays asLowAs price to logged out users
+      asLowAs: true,
+      customCSS: ".bread-embed,body,html{margin:0;padding:0;position:absolute;top:0;right:0;bottom:0;left:0;font-family:sans-serif;}.bread-btn,.bread-label{border:2px solid #055170;border-radius:8px;background:#fff;font-size:13px;color:#fb2a2a;cursor:pointer}.bread-center{text-align:center;vertical-align:middle;height:100%;width:100%;display:table}.bread-center-inner{display:table-cell;vertical-align:middle}.bread-embed-inner{position:absolute;top:0;left:0;right:50px;bottom:0;padding:0 1em}.bread-embed-icon{position:absolute;top:-1px;right:-51px;bottom:-1px;left:100%;margin-left:-50px;margin-right:50px;background-color:#055170;background-repeat:no-repeat;background-image:url(assets/coin.png);background-position:center;background-size:auto 30px;border-radius:0 4px 4px 0;cursor:pointer}.bread-pot:before{content:'Pay Over Time'}.bread-btn .bread-as-low-as:before,.bread-label .bread-as-low-as:before{content:'As low as '}.bread-for:before{content:'For '}",
+
+      /*
+      * Function: onCustomerClose
+      * Description: When customer closes the modal before completing the process,
+      * the function will return the state (prequalified, qualified, partially prequalified)
+      * the customer is in and alert them.
+      */
+      onCustomerClose: function(err, custData) {
+        if (err !== null) {
+          console.error("An error occurred getting customer close data.");
+          return;
+        }
+
+        var customerEmail = custData.email;
+        var qualState = custData.state;
+        switch (qualState) {
+          case 'PREQUALIFIED':
+            console.log(customerEmail + " was prequalified for financing.");
+            alert("You were prequalified for financing!")
+            break;
+
+          case 'PARTIALLY_PREQUALIFIED':
+            console.log(customerEmail + " was partially prequalified for financing.");
+            alert("You were partially prequalified for financing!")
+            break;
+
+          case 'NOT_PREQUALIFIED':
+            console.log(customerEmail + " was not prequalified for financing.");
+            alert("Unfortunately you were not prequalified for financing")
+            break;
+
+          case 'ABANDONED':
+            if (customerEmail === undefined || customerEmail === null) {
+              console.log("Unknown customer abandoned their prequalification attempt.");
+            } else {
+              console.log(customerEmail + " abandoned their prequalification attempt.");
+            }
+            break;
+        }
+      }
+    };
+
+    bread.checkout(opts);
+  </script>
+</body>
+
+</html>

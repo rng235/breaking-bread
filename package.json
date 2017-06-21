@@ -1,0 +1,14 @@
+{
+  "name": "bread-project",
+  "version": "1.0.0",
+  "description": "Bakin' Bread",
+  "main": "www.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ricardo Guntur",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.3"
+  }
+}
