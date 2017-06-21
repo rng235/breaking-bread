@@ -2,7 +2,7 @@
   "name": "bread-project",
   "version": "1.0.0",
   "description": "Bakin' Bread",
-  "main": "www.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,5 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.3"
+  },
+  "engines": {
+    "node": "6.11.0"
   }
 }

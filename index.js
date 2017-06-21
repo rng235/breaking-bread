@@ -8,7 +8,7 @@ app.get('/', function(req,res) {
 });
 
 app.listen(8000, function () {
-  console.log('Server running at http://127.0.0.1:8000/');
+  console.log('Server running');
 });
 
 //TODO: Why doesn't button update with new $/month after completing forms?
